@@ -1,0 +1,76 @@
+Stock Market Real-Time Data Analysis Using Kafka 
+
+Kafka notes
+- How kafka works archetecture
+- 
+==================================================================================================================
+Installations on Ec2 instance
+
+Installation of Kaftka
+
+Downloaded the latest kafka version 
+
+wget https://downloads.apache.org/kafka/3.5.1/kafka_2.12-3.5.1.tgz
+tar -xvf kafka_2.12-3.5.1.tgz
+
+------------------------------------------------------------------------------------------------------------------
+
+Install Java as kafka works on top of JVM
+
+java -version
+sudo yum install java-1.8.0-openjdk or 
+wget https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u382-b05/OpenJDK8U-jdk_x64_linux_hotspot_8u382b05.tar.gz
+
+Set the JAVA_HOME environment variable using the extracted directory name (replace "jdkX.X.X_XXX" 
+with the actual directory name you obtained from the previous step):
+ - ls /usr/local/
+ 
+sudo sh -c "echo 'export JAVA_HOME=/usr/local/jdkX.X.X_XXX' >> /etc/profile.d/java.sh"
+sudo sh -c "echo 'export PATH=\$JAVA_HOME/bin:\$PATH' >> /etc/profile.d/java.sh"
+
+Reload the system environment to apply the changes:
+source /etc/profile.d/java.sh
+
+java -version
+cd kafka_2.12-3.5.1
+
+Start Zoo-keeper:
+-------------------------------
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+Open another window to start kafka
+But first ssh to to your ec2 machine as done above
+
+Start Kafka-server:
+----------------------------------------
+Duplicate the session & enter in a new console --
+
+export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
+cd kafka_2.12-3.5.1
+
+bin/kafka-server-start.sh config/server.properties
+
+It is pointing to private server , change server.properties so that it can run in public IP 
+
+To do this , you can follow any of the 2 approaches shared belwo --
+Do a "sudo nano config/server.properties" - change ADVERTISED_LISTENERS to public ip of the EC2 instance
+
+
+Create the topic:
+-----------------------------
+Duplicate the session & enter in a new console --
+cd kafka_2.12-3.5.1
+bin/kafka-topics.sh --create --topic realtime_stocks --bootstrap-server {Put the Public IP of your EC2 Instance:9092} --replication-factor 1 --partitions 1
+
+bin/kafka-topics.sh --create --topic realtime_stocks --bootstrap-server 3.17.138.17:9092 --replication-factor 1 --partitions 1
+
+Start Producer:
+--------------------------
+bin/kafka-console-producer.sh --topic realtime_stocks --bootstrap-server 3.17.138.17:9092 
+
+
+Start Consumer:
+-------------------------
+Duplicate the session & enter in a new console --
+cd kafka_2.12-3.5.1
+bin/kafka-console-consumer.sh --topic realtime_stocks --bootstrap-server 3.17.138.17:9092 
